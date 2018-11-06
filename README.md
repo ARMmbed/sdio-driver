@@ -1,5 +1,8 @@
-# sdio-driver
-SDIO block device driver
+# SDIO-driver
+
+SDIO block device driver. 
+
+This is not officially supported driver.
 
 ## License & Contributions 
 
