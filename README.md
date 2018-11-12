@@ -11,11 +11,14 @@ The software is provided under [Apache-2.0 license](LICENSE). Contributions to t
 This is an implementation for a blockdevice to use SDHC cards via SDIO interface.
 
 ## Supported Hardware
-- STM32F4 
+- STM32F4
+- STM32F7
 
 ## Tested Hardware
 - STM Discovery board 32F469IDISCOVERY, Targetname: DISCO_F469NI
   https://os.mbed.com/platforms/ST-Discovery-F469NI/
+- STM Discovery board 32F746IDISCOVERY, Targetname: DISCO_F746NG
+  https://os.mbed.com/platforms/ST-Discovery-F746NG/
   
   
 ## Driver Description
