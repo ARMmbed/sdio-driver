@@ -38,7 +38,7 @@ static status_t SD_SendWriteSuccessBlocks(sd_card_t *card, uint32_t *blocks);
  * @retval kStatus_SDMMC_CardNotSupport Card doesn't support.
  * @retval kStatus_Success Operate successfully.
  */
-static status_t inline SD_SendApplicationCmd(sd_card_t *card, uint32_t relativeAddress);
+static inline status_t SD_SendApplicationCmd(sd_card_t *card, uint32_t relativeAddress);
 
 /*!
  * @brief Send GO_IDLE command to set the card to be idle state.
@@ -47,7 +47,7 @@ static status_t inline SD_SendApplicationCmd(sd_card_t *card, uint32_t relativeA
  * @retval kStatus_SDMMC_TransferFailed Transfer failed.
  * @retval kStatus_Success Operate successfully.
  */
-static status_t inline SD_GoIdle(sd_card_t *card);
+static inline status_t SD_GoIdle(sd_card_t *card);
 
 /*!
  * @brief Send STOP_TRANSMISSION command after multiple blocks read/write.
@@ -66,7 +66,7 @@ static status_t SD_StopTransmission(sd_card_t *card);
  * @retval kStatus_SDMMC_TransferFailed Transfer failed.
  * @retval kStatus_Success Operate successfully.
  */
-static status_t inline SD_SetBlockSize(sd_card_t *card, uint32_t blockSize);
+static inline status_t SD_SetBlockSize(sd_card_t *card, uint32_t blockSize);
 
 /*!
  * @brief Send GET_RCA command to get card relative address.
@@ -288,7 +288,7 @@ static status_t SD_Transfer(sd_card_t *card, SDMMCHOST_TRANSFER *content, uint32
  * @retval kStatus_SDMMC_TuningFail tuning fail.
  * @retval kStatus_SDMMC_TransferFailed transfer fail
  */
-static status_t inline SD_ExecuteTuning(sd_card_t *card);
+static inline status_t SD_ExecuteTuning(sd_card_t *card);
 
 /*******************************************************************************
  * Variables
@@ -314,28 +314,28 @@ static uint32_t s_sdAuSizeMap[] = {0,
 /*******************************************************************************
  * Code
  ******************************************************************************/
-static status_t inline SD_SendApplicationCmd(sd_card_t *card, uint32_t relativeAddress)
+static inline status_t SD_SendApplicationCmd(sd_card_t *card, uint32_t relativeAddress)
 {
     assert(card);
 
     return SDMMC_SendApplicationCommand(card->host.base, card->host.transfer, relativeAddress);
 }
 
-static status_t inline SD_GoIdle(sd_card_t *card)
+static inline status_t SD_GoIdle(sd_card_t *card)
 {
     assert(card);
 
     return SDMMC_GoIdle(card->host.base, card->host.transfer);
 }
 
-static status_t inline SD_SetBlockSize(sd_card_t *card, uint32_t blockSize)
+static inline status_t SD_SetBlockSize(sd_card_t *card, uint32_t blockSize)
 {
     assert(card);
 
     return SDMMC_SetBlockSize(card->host.base, card->host.transfer, blockSize);
 }
 
-static status_t inline SD_ExecuteTuning(sd_card_t *card)
+static inline status_t SD_ExecuteTuning(sd_card_t *card)
 {
     assert(card);
 
@@ -1162,6 +1162,8 @@ static status_t SD_SelectBusTiming(sd_card_t *card)
                 }
                 SDMMC_LOG("\r\nNote: SDR104 mode is not supported by card");
 
+                /* FALLTHROUGH */
+
             case kSD_TimingDDR50Mode:
                 error = SD_SelectFunction(card, kSD_GroupTimingMode, kSD_FunctionDDR50);
                 if (error == kStatus_Success)
@@ -1174,6 +1176,8 @@ static status_t SD_SelectBusTiming(sd_card_t *card)
                 }
                 SDMMC_LOG("\r\nNote: DDR50 mode is not supported by card");
 
+                /* FALLTHROUGH */
+
             case kSD_TimingSDR50Mode:
                 error = SD_SelectFunction(card, kSD_GroupTimingMode, kSD_FunctionSDR50);
                 if (error == kStatus_Success)
@@ -1184,6 +1188,8 @@ static status_t SD_SelectBusTiming(sd_card_t *card)
                     break;
                 }
                 SDMMC_LOG("\r\nNote: SDR50 mode is not supported by card");
+
+                /* FALLTHROUGH */
 
             case kSD_TimingSDR25HighSpeedMode:
                 error = SD_SelectFunction(card, kSD_GroupTimingMode, kSD_FunctionSDR25HighSpeed);

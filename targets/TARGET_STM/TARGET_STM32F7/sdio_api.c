@@ -120,7 +120,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
         hdma_sdmmc_rx.Init.PeriphBurst = DMA_PBURST_INC4;
         if (HAL_DMA_Init(&hdma_sdmmc_rx) != HAL_OK)
         {
-            error("SDMMC DMA Init error at %d in %s", __FILE__, __LINE__);
+            error("SDMMC DMA Init error at %d in %s", __LINE__, __FILE__);
         }
 
         __HAL_LINKDMA(hsd, hdmarx, hdma_sdmmc_rx);
@@ -147,7 +147,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
         hdma_sdmmc_tx.Init.PeriphBurst = DMA_PBURST_INC4;
         if (HAL_DMA_Init(&hdma_sdmmc_tx) != HAL_OK)
         {
-            error("SDMMC DMA Init error at %d in %s", __FILE__, __LINE__);
+            error("SDMMC DMA Init error at %d in %s", __LINE__, __FILE__);
         }
 
         __HAL_LINKDMA(hsd, hdmatx, hdma_sdmmc_tx);
