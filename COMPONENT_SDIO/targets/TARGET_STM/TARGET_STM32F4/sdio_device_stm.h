@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __SDIO_DEVICE_H
-#define __SDIO_DEVICE_H
+#ifndef __SDIO_DEVICE_STM_H
+#define __SDIO_DEVICE_STM_H
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#include "stm32f7xx_hal.h"
+#include "stm32f4xx_hal.h"
 
   /* Typedefs */
 
@@ -52,13 +51,13 @@ extern "C"
 
 /* Exported constants */
 /**
-  * @brief  SD status structure definition  
+  * @brief  SD status structure definition
   */
 #define MSD_OK ((uint8_t)0x00)
 #define MSD_ERROR ((uint8_t)0x01)
 
-/** 
-  * @brief  SD transfer state definition  
+/**
+  * @brief  SD transfer state definition
   */
 #define SD_TRANSFER_OK ((uint8_t)0x00)
 #define SD_TRANSFER_BUSY ((uint8_t)0x01)
@@ -85,4 +84,4 @@ extern "C"
 }
 #endif
 
-#endif /* __SDIO_DEVICE_H */
+#endif /* __SDIO_DEVICE_STM_H */
