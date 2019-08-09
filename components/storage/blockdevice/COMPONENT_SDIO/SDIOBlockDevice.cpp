@@ -17,7 +17,9 @@
 
 
 #include "sdio_api.h"
+#if DEVICE_SDIO_ASYNC
 #include "us_ticker_api.h"
+#endif
 #include "SDIOBlockDevice.h"
 #include "platform/mbed_debug.h"
 
@@ -335,6 +337,7 @@ int SDIOBlockDevice::trim(bd_addr_t addr, bd_size_t size)
         debug_if(SD_DBG, "Erase blocks failed! addr: %lld  blockCnt: %lld \n", addr, blockCnt);
         unlock();
         return SD_BLOCK_DEVICE_ERROR_ERASEBLOCKS;
+#if DEVICE_SDIO_ASYNC
     } else {
         uint32_t tickstart = us_ticker_read();
         while (sdio_get_card_state() != SD_TRANSFER_OK) {
@@ -344,6 +347,7 @@ int SDIOBlockDevice::trim(bd_addr_t addr, bd_size_t size)
                 return SD_BLOCK_DEVICE_ERROR_ERASEBLOCKS;
             }
         }
+#endif
     }
 
     unlock();
