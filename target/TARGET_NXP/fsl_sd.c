@@ -1162,6 +1162,8 @@ static status_t SD_SelectBusTiming(sd_card_t *card)
                 }
                 SDMMC_LOG("\r\nNote: SDR104 mode is not supported by card");
 
+                /* FALLTHROUGH */
+
             case kSD_TimingDDR50Mode:
                 error = SD_SelectFunction(card, kSD_GroupTimingMode, kSD_FunctionDDR50);
                 if (error == kStatus_Success)
@@ -1174,6 +1176,8 @@ static status_t SD_SelectBusTiming(sd_card_t *card)
                 }
                 SDMMC_LOG("\r\nNote: DDR50 mode is not supported by card");
 
+                /* FALLTHROUGH */
+
             case kSD_TimingSDR50Mode:
                 error = SD_SelectFunction(card, kSD_GroupTimingMode, kSD_FunctionSDR50);
                 if (error == kStatus_Success)
@@ -1184,6 +1188,8 @@ static status_t SD_SelectBusTiming(sd_card_t *card)
                     break;
                 }
                 SDMMC_LOG("\r\nNote: SDR50 mode is not supported by card");
+
+                /* FALLTHROUGH */
 
             case kSD_TimingSDR25HighSpeedMode:
                 error = SD_SelectFunction(card, kSD_GroupTimingMode, kSD_FunctionSDR25HighSpeed);
