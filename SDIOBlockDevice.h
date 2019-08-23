@@ -26,7 +26,14 @@ class SDIOBlockDevice : public mbed::BlockDevice {
 public:
     SDIOBlockDevice(PinName cardDetect = NC);
     virtual ~SDIOBlockDevice();
-    /** Initialize a block device
+  
+    /** Pass pointer to block device object 
+     * 
+     *  @return         Pointer to Blockdevice 
+     */
+    static BlockDevice *get_default_instance();
+	
+  /** Initialize a block device
      *
      *  @return         0 on success or a negative error code on failure
      */
