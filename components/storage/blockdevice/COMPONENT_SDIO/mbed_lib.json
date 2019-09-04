@@ -1,0 +1,12 @@
+{
+    "name": "sdio",
+    "config": {
+        "CMD_TIMEOUT": 30000,
+        "CD": "NC"
+    },
+    "target_overrides": {
+        "DISCO_F469NI": {
+            "CMD_TIMEOUT": 30000
+        }
+    }
+}
