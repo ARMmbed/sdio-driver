@@ -104,35 +104,34 @@ int sdio_deinit(void)
     return MSD_OK;
 }
 
-int sdio_readblocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks)
+int sdio_read_blocks(uint8_t *data, uint32_t address, uint32_t block_count)
 {
     int sd_state = MSD_OK;
 
-    if (SD_ReadBlocks(&g_sd, (uint8_t *)pData, ReadAddr, NumOfBlocks) != kStatus_Success) {
+    if (SD_ReadBlocks(&g_sd, data, address, block_count) != kStatus_Success) {
         sd_state = MSD_ERROR;
     }
 
     return sd_state;
 }
 
-int sdio_writeblocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks)
+int sdio_write_blocks(uint8_t *data, uint32_t address, uint32_t block_count)
 {
     int sd_state = MSD_OK;
 
-    if (SD_WriteBlocks(&g_sd, (uint8_t *)pData, WriteAddr, NumOfBlocks) != kStatus_Success) {
+    if (SD_WriteBlocks(&g_sd, data, address, block_count) != kStatus_Success) {
         sd_state = MSD_ERROR;
     }
 
     return sd_state;
 }
 
-int sdio_erase(uint32_t StartAddr, uint32_t EndAddr)
+int sdio_erase(uint32_t start_address, uint32_t end_address)
 {
     int sd_state = MSD_OK;
 
-    uint32_t blocks = (EndAddr - StartAddr) / g_sd.blockSize;
-    if (SD_EraseBlocks(&g_sd, StartAddr, blocks) != kStatus_Success)
-    {
+    uint32_t blocks = (end_address - start_address) / g_sd.blockSize;
+    if (SD_EraseBlocks(&g_sd, start_address, blocks) != kStatus_Success) {
         sd_state = MSD_ERROR;
     }
 
@@ -150,17 +149,16 @@ int sdio_get_card_state(void)
     return sd_state;
 }
 
-void sdio_get_card_info(SDIO_Cardinfo_t *CardInfo)
+void sdio_get_card_info(sdio_card_info_t *card_info)
 {
-    CardInfo->CardType = 4;
-    CardInfo->CardVersion = g_sd.version;
-    CardInfo->Class = 0;
-    CardInfo->RelCardAdd = g_sd.relativeAddress;
-    CardInfo->BlockNbr = g_sd.blockCount;
-    CardInfo->BlockSize = g_sd.blockSize;
-    CardInfo->LogBlockNbr = g_sd.blockCount;
-    CardInfo->LogBlockSize = g_sd.blockSize;
+    card_info->card_type = 4;
+    card_info->card_version = g_sd.version;
+    card_info->card_class = 0;
+    card_info->rel_card_addr = g_sd.relativeAddress;
+    card_info->block_count = g_sd.blockCount;
+    card_info->block_size = g_sd.blockSize;
+    card_info->log_block_count = g_sd.blockCount;
+    card_info->log_block_size = g_sd.blockSize;
 }
-
 
 #endif // DEVICE_SDIO

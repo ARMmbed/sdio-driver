@@ -21,13 +21,17 @@
 #if DEVICE_SDIO
 
 #include "BlockDevice.h"
-#include "DigitalIn.h"
-#include "PlatformMutex.h"
+#include "drivers/DigitalIn.h"
+#include "platform/PlatformMutex.h"
 #include "sdio_api.h"
+
+#ifndef MBED_CONF_SDIO_CD
+#define MBED_CONF_SDIO_CD NC
+#endif
 
 class SDIOBlockDevice : public mbed::BlockDevice {
 public:
-    SDIOBlockDevice(PinName cardDetect = NC);
+    SDIOBlockDevice(PinName card_detect = MBED_CONF_SDIO_CD);
     virtual ~SDIOBlockDevice();
     /** Initialize a block device
      *
@@ -113,7 +117,7 @@ public:
      *
      *  @note check physical present switch. Maybe not support by hardware, then function will always return true.
      */
-    virtual bool isPresent(void);
+    virtual bool is_present(void);
 
     /** Get the BlockDevice class type.
      *
@@ -122,26 +126,24 @@ public:
     virtual const char *get_type() const;
 
 private:
-    mbed::DigitalIn _cardDetect;
+    mbed::DigitalIn _card_detect;
     bool _is_initialized;
     bd_size_t _block_size;
     bd_size_t _erase_size;
     bd_size_t _sectors;
     uint32_t _init_ref_count;
-    SDIO_Cardinfo_t _cardInfo;
+    sdio_card_info_t _card_info;
 
     PlatformMutex _mutex;
-    virtual void lock()
-    {
+    virtual void lock() {
         _mutex.lock();
     }
 
-    virtual void unlock()
-    {
+    virtual void unlock() {
         _mutex.unlock();
     }
 
-    bool _is_valid_trim(bd_addr_t addr, bd_size_t size);
+    bool _is_valid_trim(bd_addr_t addr, bd_size_t size) const;
 };
 
 #endif // DEVICE_SDIO

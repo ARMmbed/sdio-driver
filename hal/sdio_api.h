@@ -1,4 +1,3 @@
-
 /** \addtogroup hal */
 /** @{*/
 /* mbed Microcontroller Library
@@ -36,15 +35,15 @@ extern "C"
  */
 
 typedef struct {
-    uint32_t CardType;     /* Specifies the card Type                         */
-    uint32_t CardVersion;  /* Specifies the card version                      */
-    uint32_t Class;        /* Specifies the class of the card class           */
-    uint32_t RelCardAdd;   /* Specifies the Relative Card Address             */
-    uint32_t BlockNbr;     /* Specifies the Card Capacity in blocks           */
-    uint32_t BlockSize;    /* Specifies one block size in bytes               */
-    uint32_t LogBlockNbr;  /* Specifies the Card logical Capacity in blocks   */
-    uint32_t LogBlockSize; /* Specifies logical block size in bytes           */
-} SDIO_Cardinfo_t;
+    uint32_t card_type;        /* Specifies the card Type                         */
+    uint32_t card_version;     /* Specifies the card version                      */
+    uint32_t card_class;       /* Specifies the class of the card class           */
+    uint32_t rel_card_addr;    /* Specifies the Relative Card Address             */
+    uint32_t block_count;      /* Specifies the Card Capacity in blocks           */
+    uint32_t block_size;       /* Specifies one block size in bytes               */
+    uint32_t log_block_count;  /* Specifies the Card logical Capacity in blocks   */
+    uint32_t log_block_size;   /* Specifies logical block size in bytes           */
+} sdio_card_info_t;
 
 /**
   * @brief  SD status structure definition
@@ -72,41 +71,41 @@ int sdio_deinit(void);
 
 /**
  * @brief  Reads block(s) from a specified address in an SD card, in polling mode.
- * @param  pData: Pointer to the buffer that will contain the data to transmit
- * @param  ReadAddr: Address from where data is to be read
- * @param  NumOfBlocks: Number of SD blocks to read
+ * @param  data: Pointer to the buffer that will contain the data to transmit
+ * @param  address: Address from where data is to be read
+ * @param  block_count: Number of SD blocks to read
  * @retval SD status
  */
-int sdio_readblocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks);
+int sdio_read_blocks(uint8_t *data, uint32_t address, uint32_t block_count);
 
 /**
  * @brief  Writes block(s) to a specified address in an SD card, in polling mode.
- * @param  pData: Pointer to the buffer that will contain the data to transmit
- * @param  WriteAddr: Address from where data is to be written
- * @param  NumOfBlocks: Number of SD blocks to write
+ * @param  data: Pointer to the buffer that will contain the data to transmit
+ * @param  address: Address from where data is to be written
+ * @param  block_count: Number of SD blocks to write
  * @retval SD status
  */
-int sdio_writeblocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks);
+int sdio_write_blocks(uint8_t *data, uint32_t address, uint32_t block_count);
 
 #if DEVICE_SDIO_ASYNC
 
 /**
  * @brief  Reads block(s) from a specified address in an SD card, in DMA mode.
- * @param  pData: Pointer to the buffer that will contain the data to transmit
- * @param  ReadAddr: Address from where data is to be read
- * @param  NumOfBlocks: Number of SD blocks to read
+ * @param  data: Pointer to the buffer that will contain the data to transmit
+ * @param  address: Address from where data is to be read
+ * @param  block_count: Number of SD blocks to read
  * @retval SD status
  */
-int sdio_readblocks_async(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks);
+int sdio_read_blocks_async(uint8_t *data, uint32_t address, uint32_t block_count);
 
 /**
  * @brief  Writes block(s) to a specified address in an SD card, in DMA mode.
- * @param  pData: Pointer to the buffer that will contain the data to transmit
- * @param  WriteAddr: Address from where data is to be written
- * @param  NumOfBlocks: Number of SD blocks to write
+ * @param  data: Pointer to the buffer that will contain the data to transmit
+ * @param  address: Address from where data is to be written
+ * @param  block_count: Number of SD blocks to write
  * @retval SD status
  */
-int sdio_writeblocks_async(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks);
+int sdio_write_blocks_async(uint8_t *data, uint32_t address, uint32_t block_count);
 
 /**
  * @brief  Check if a DMA operation is pending
@@ -130,11 +129,11 @@ int sdio_write_pending(void);
 
 /**
  * @brief  Erases the specified memory area of the given SD card.
- * @param  StartAddr: Start byte address
- * @param  EndAddr: End byte address
+ * @param  start_address: Start byte address
+ * @param  end_address: End byte address
  * @retval SD status
  */
-int sdio_erase(uint32_t StartAddr, uint32_t EndAddr);
+int sdio_erase(uint32_t start_address, uint32_t end_address);
 
 /**
  * @brief  Gets the current SD card data status.
@@ -148,10 +147,10 @@ int sdio_get_card_state(void);
 
 /**
  * @brief  Get SD information about specific SD card.
- * @param  CardInfo: Pointer to HAL_SD_CardInfoTypedef structure
+ * @param  card_info: Pointer to HAL_SD_CardInfoTypedef structure
  * @retval None
  */
-void sdio_get_card_info(SDIO_Cardinfo_t *CardInfo);
+void sdio_get_card_info(sdio_card_info_t *card_info);
 
 /**@}*/
 

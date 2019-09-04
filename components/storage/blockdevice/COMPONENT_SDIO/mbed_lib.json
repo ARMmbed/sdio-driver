@@ -6,7 +6,7 @@
     },
     "target_overrides": {
         "DISCO_F469NI": {
-			"CMD_TIMEOUT": 30000
+            "CMD_TIMEOUT": 30000
         }
     }
 }

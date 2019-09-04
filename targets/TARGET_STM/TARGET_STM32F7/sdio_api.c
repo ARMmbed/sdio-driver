@@ -310,11 +310,11 @@ int sdio_deinit(void)
     return sd_state;
 }
 
-int sdio_readblocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks)
+int sdio_read_blocks(uint8_t *data, uint32_t address, uint32_t block_count)
 {
     int sd_state = MSD_OK;
 
-    if (HAL_SD_ReadBlocks(&hsd, (uint8_t *)pData, ReadAddr, NumOfBlocks, CMD_TIMEOUT) != HAL_OK)
+    if (HAL_SD_ReadBlocks(&hsd, data, address, block_count, CMD_TIMEOUT) != HAL_OK)
     {
         sd_state = MSD_ERROR;
     }
@@ -322,11 +322,11 @@ int sdio_readblocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks)
     return sd_state;
 }
 
-int sdio_writeblocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks)
+int sdio_write_blocks(uint8_t *data, uint32_t address, uint32_t block_count)
 {
     int sd_state = MSD_OK;
 
-    if (HAL_SD_WriteBlocks(&hsd, (uint8_t *)pData, WriteAddr, NumOfBlocks, CMD_TIMEOUT) != HAL_OK)
+    if (HAL_SD_WriteBlocks(&hsd, data, address, block_count, CMD_TIMEOUT) != HAL_OK)
     {
         sd_state = MSD_ERROR;
     }
@@ -334,13 +334,13 @@ int sdio_writeblocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks)
     return sd_state;
 }
 
-int sdio_readblocks_async(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks)
+int sdio_read_blocks_async(uint8_t *data, uint32_t address, uint32_t block_count)
 {
     int sd_state = MSD_OK;
     SD_DMA_ReadPendingState = SD_TRANSFER_BUSY;
 
     /* Read block(s) in DMA transfer mode */
-    if (HAL_SD_ReadBlocks_DMA(&hsd, (uint8_t *)pData, ReadAddr, NumOfBlocks) != HAL_OK)
+    if (HAL_SD_ReadBlocks_DMA(&hsd, data, address, block_count) != HAL_OK)
     {
         sd_state = MSD_ERROR;
         SD_DMA_ReadPendingState = SD_TRANSFER_OK;
@@ -349,13 +349,13 @@ int sdio_readblocks_async(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBloc
     return sd_state;
 }
 
-int sdio_writeblocks_async(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks)
+int sdio_write_blocks_async(uint8_t *data, uint32_t address, uint32_t block_count)
 {
     int sd_state = MSD_OK;
     SD_DMA_WritePendingState = SD_TRANSFER_BUSY;
 
     /* Write block(s) in DMA transfer mode */
-    if (HAL_SD_WriteBlocks_DMA(&hsd, (uint8_t *)pData, WriteAddr, NumOfBlocks) != HAL_OK)
+    if (HAL_SD_WriteBlocks_DMA(&hsd, data, address, block_count) != HAL_OK)
     {
         sd_state = MSD_ERROR;
         SD_DMA_WritePendingState = SD_TRANSFER_OK;
@@ -364,11 +364,11 @@ int sdio_writeblocks_async(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBl
     return sd_state;
 }
 
-int sdio_erase(uint32_t StartAddr, uint32_t EndAddr)
+int sdio_erase(uint32_t start_address, uint32_t end_address)
 {
     int sd_state = MSD_OK;
 
-    if (HAL_SD_Erase(&hsd, StartAddr, EndAddr) != HAL_OK)
+    if (HAL_SD_Erase(&hsd, start_address, end_address) != HAL_OK)
     {
         sd_state = MSD_ERROR;
     }
@@ -381,23 +381,23 @@ int sdio_get_card_state(void)
     return ((HAL_SD_GetCardState(&hsd) == HAL_SD_CARD_TRANSFER) ? SD_TRANSFER_OK : SD_TRANSFER_BUSY);
 }
 
-void sdio_get_card_info(SDIO_Cardinfo_t *CardInfo)
+void sdio_get_card_info(sdio_card_info_t *card_info)
 {
     /* Get SD card Information, copy structure for portability */
     HAL_SD_CardInfoTypeDef HAL_CardInfo;
 
     HAL_SD_GetCardInfo(&hsd, &HAL_CardInfo);
 
-    if (CardInfo)
+    if (card_info)
     {
-        CardInfo->CardType = HAL_CardInfo.CardType;
-        CardInfo->CardVersion = HAL_CardInfo.CardVersion;
-        CardInfo->Class = HAL_CardInfo.Class;
-        CardInfo->RelCardAdd = HAL_CardInfo.RelCardAdd;
-        CardInfo->BlockNbr = HAL_CardInfo.BlockNbr;
-        CardInfo->BlockSize = HAL_CardInfo.BlockSize;
-        CardInfo->LogBlockNbr = HAL_CardInfo.LogBlockNbr;
-        CardInfo->LogBlockSize = HAL_CardInfo.LogBlockSize;
+        card_info->card_type = HAL_CardInfo.CardType;
+        card_info->card_version = HAL_CardInfo.CardVersion;
+        card_info->card_class = HAL_CardInfo.Class;
+        card_info->rel_card_addr = HAL_CardInfo.RelCardAdd;
+        card_info->block_count = HAL_CardInfo.BlockNbr;
+        card_info->block_size = HAL_CardInfo.BlockSize;
+        card_info->log_block_count = HAL_CardInfo.LogBlockNbr;
+        card_info->log_block_size = HAL_CardInfo.LogBlockSize;
     }
 }
 
