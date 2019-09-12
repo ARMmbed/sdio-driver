@@ -17,8 +17,6 @@
 #include "pinmap.h"
 #include "sdio_device.h"
 
-/* Array of SD peripheral base address. */
-static SDIF_Type *const sd_addrs[] = SDIF_BASE_PTRS;
 static sd_card_t g_sd;
 
 extern void sdio_clock_setup(void);
