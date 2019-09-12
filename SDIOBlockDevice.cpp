@@ -74,6 +74,12 @@ SDIOBlockDevice::~SDIOBlockDevice()
     }
 }
 
+BlockDevice * BlockDevice::get_default_instance()
+{
+    static SDIOBlockDevice bd;
+    return &bd;
+}
+
 int SDIOBlockDevice::init()
 {
     debug_if(SD_DBG, "init Card...\r\n");
