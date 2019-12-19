@@ -114,6 +114,13 @@ class SDIOBlockDevice : public BlockDevice
      */
     virtual bool isPresent(void);
 
+     /** Get the BlockDevice class type.
+     *
+     *  @return         A string representation of the BlockDevice class type.
+     */
+    virtual const char *get_type() const;
+
+
   private:
     DigitalIn _cardDetect;
     bool _is_initialized;

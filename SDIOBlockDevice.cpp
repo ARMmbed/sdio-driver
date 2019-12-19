@@ -404,4 +404,9 @@ bool SDIOBlockDevice::isPresent(void)
     }
 }
 
+const char *SDIOBlockDevice::get_type() const
+{
+    return "SDIO";
+}
+
 } // namespace mbed
