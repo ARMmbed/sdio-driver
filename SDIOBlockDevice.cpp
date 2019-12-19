@@ -112,9 +112,9 @@ int SDIOBlockDevice::init()
 
     SD_GetCardInfo(&_cardInfo);
     _is_initialized = true;
-    debug_if(SD_DBG, "SD initialized: type: %d  version: %d  class: %d\n",
+    debug_if(SD_DBG, "SD initialized: type: %ld  version: %ld  class: %ld\n",
              _cardInfo.CardType, _cardInfo.CardVersion, _cardInfo.Class);
-    debug_if(SD_DBG, "SD size: %d MB\n",
+    debug_if(SD_DBG, "SD size: %ld MB\n",
              _cardInfo.LogBlockNbr / 2 / 1024);
 
     // get sectors count from cardinfo
