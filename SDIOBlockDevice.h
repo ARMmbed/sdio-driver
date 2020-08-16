@@ -18,9 +18,9 @@
 
 #define MBED_OS_FEATURES_STORAGE_BLOCKDEVICE_SDIOBLOCKDEVICE_H_
 
-#include "features/storage/blockdevice/BlockDevice.h"
-#include "drivers/DigitalIn.h"
-#include "platform/PlatformMutex.h"
+#include "BlockDevice.h"
+#include "DigitalIn.h"
+#include "PlatformMutex.h"
 #include "sdio_device.h"
 
 namespace mbed
