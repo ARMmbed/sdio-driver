@@ -61,7 +61,7 @@ void _DMA_Stream_Tx_IRQHandler(void)
 void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
 {
     IRQn_Type IRQn;
-    GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
 
     if (hsd->Instance == SDMMC1)
     {
@@ -116,8 +116,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
         hdma_sdmmc_rx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
         hdma_sdmmc_rx.Init.MemBurst = DMA_MBURST_INC4;
         hdma_sdmmc_rx.Init.PeriphBurst = DMA_PBURST_INC4;
-        if (HAL_DMA_Init(&hdma_sdmmc_rx) != HAL_OK)
-        {
+        if (HAL_DMA_Init(&hdma_sdmmc_rx) != HAL_OK) {
             error("SDMMC DMA Init error at %d in %s", __LINE__, __FILE__);
         }
 
@@ -143,8 +142,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
         hdma_sdmmc_tx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
         hdma_sdmmc_tx.Init.MemBurst = DMA_MBURST_INC4;
         hdma_sdmmc_tx.Init.PeriphBurst = DMA_PBURST_INC4;
-        if (HAL_DMA_Init(&hdma_sdmmc_tx) != HAL_OK)
-        {
+        if (HAL_DMA_Init(&hdma_sdmmc_tx) != HAL_OK) {
             error("SDMMC DMA Init error at %d in %s", __LINE__, __FILE__);
         }
 
@@ -159,14 +157,130 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
         /* Enable NVIC for DMA transfer complete interrupts */
         IRQn = DMA2_Stream3_IRQn;
         NVIC_SetVector(IRQn, (uint32_t)&_DMA_Stream_Rx_IRQHandler);
-        HAL_NVIC_SetPriority(IRQn, 0x0F, 0);
+        HAL_NVIC_SetPriority(IRQn, 0x0, 0);
         HAL_NVIC_EnableIRQ(IRQn);
 
         IRQn = DMA2_Stream6_IRQn;
         NVIC_SetVector(IRQn, (uint32_t)&_DMA_Stream_Tx_IRQHandler);
+        HAL_NVIC_SetPriority(IRQn, 0x0, 0);
+        HAL_NVIC_EnableIRQ(IRQn);
+    } 
+    
+#ifdef SDMMC2
+    if(hsd->Instance==SDMMC2) {
+        // set clock source for SDMMC2 to CLK48
+        RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+        PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SDMMC2;
+        PeriphClkInitStruct.Sdmmc2ClockSelection = RCC_SDMMC2CLKSOURCE_CLK48;
+        [[maybe_unused]] volatile int err = HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
+
+        /* Peripheral clock enable */
+        __HAL_RCC_SDMMC2_CLK_ENABLE();
+        __HAL_RCC_DMA2_CLK_ENABLE();
+
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+        __HAL_RCC_GPIOD_CLK_ENABLE();
+        __HAL_RCC_GPIOG_CLK_ENABLE();
+        /**SDMMC2 GPIO Configuration
+        PB4     ------> SDMMC2_D3
+        PB3     ------> SDMMC2_D2
+        PD7     ------> SDMMC2_CMD
+        PD6     ------> SDMMC2_CK
+        PG10     ------> SDMMC2_D1
+        PG9     ------> SDMMC2_D0
+        */
+        GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_3;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF10_SDMMC2;
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+        GPIO_InitStruct.Pin = GPIO_PIN_7|GPIO_PIN_6;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF11_SDMMC2;
+        HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+        GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF11_SDMMC2;
+        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+        /* NVIC configuration for SDMMC interrupts */
+        IRQn = SDMMC2_IRQn;
+        HAL_NVIC_SetPriority(IRQn, 0x0, 0);
+        NVIC_SetVector(IRQn, (uint32_t)&_SDMMC_IRQHandler);
+        HAL_NVIC_EnableIRQ(IRQn);
+
+        /* SDMMC DMA Init */
+        /* SDMMC_RX Init */
+        hdma_sdmmc_rx.Instance = DMA2_Stream0;
+        hdma_sdmmc_rx.Init.Channel = DMA_CHANNEL_11;
+        hdma_sdmmc_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+        hdma_sdmmc_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+        hdma_sdmmc_rx.Init.MemInc = DMA_MINC_ENABLE;
+        hdma_sdmmc_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+        hdma_sdmmc_rx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+        hdma_sdmmc_rx.Init.Mode = DMA_PFCTRL;
+        hdma_sdmmc_rx.Init.Priority = DMA_PRIORITY_LOW;
+        hdma_sdmmc_rx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+        hdma_sdmmc_rx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+        hdma_sdmmc_rx.Init.MemBurst = DMA_MBURST_INC4;
+        hdma_sdmmc_rx.Init.PeriphBurst = DMA_PBURST_INC4;
+        if (HAL_DMA_Init(&hdma_sdmmc_rx) != HAL_OK) {
+            error("SDMMC DMA Init error at %d in %s", __LINE__, __FILE__);
+        }
+
+        __HAL_LINKDMA(hsd, hdmarx, hdma_sdmmc_rx);
+
+        /* Deinitialize the stream for new transfer */
+        HAL_DMA_DeInit(&hdma_sdmmc_rx);
+
+        /* Configure the DMA stream */
+        HAL_DMA_Init(&hdma_sdmmc_rx);
+
+        /* SDMMC_TX Init */
+        hdma_sdmmc_tx.Instance = DMA2_Stream5;
+        hdma_sdmmc_tx.Init.Channel = DMA_CHANNEL_11;
+        hdma_sdmmc_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+        hdma_sdmmc_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+        hdma_sdmmc_tx.Init.MemInc = DMA_MINC_ENABLE;
+        hdma_sdmmc_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+        hdma_sdmmc_tx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+        hdma_sdmmc_tx.Init.Mode = DMA_PFCTRL;
+        hdma_sdmmc_tx.Init.Priority = DMA_PRIORITY_LOW;
+        hdma_sdmmc_tx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+        hdma_sdmmc_tx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+        hdma_sdmmc_tx.Init.MemBurst = DMA_MBURST_INC4;
+        hdma_sdmmc_tx.Init.PeriphBurst = DMA_PBURST_INC4;
+        if (HAL_DMA_Init(&hdma_sdmmc_tx) != HAL_OK) {
+            error("SDMMC DMA Init error at %d in %s", __LINE__, __FILE__);
+        }
+
+        __HAL_LINKDMA(hsd, hdmatx, hdma_sdmmc_tx);
+
+        /* Deinitialize the stream for new transfer */
+        HAL_DMA_DeInit(&hdma_sdmmc_tx);
+
+        /* Configure the DMA stream */
+        HAL_DMA_Init(&hdma_sdmmc_tx);
+
+        /* Enable NVIC for DMA transfer complete interrupts */
+        IRQn = DMA2_Stream0_IRQn;
+        NVIC_SetVector(IRQn, (uint32_t)&_DMA_Stream_Rx_IRQHandler);
+        HAL_NVIC_SetPriority(IRQn, 0x0F, 0);
+        HAL_NVIC_EnableIRQ(IRQn);
+
+        IRQn = DMA2_Stream5_IRQn;
+        NVIC_SetVector(IRQn, (uint32_t)&_DMA_Stream_Tx_IRQHandler);
         HAL_NVIC_SetPriority(IRQn, 0x0F, 0);
         HAL_NVIC_EnableIRQ(IRQn);
     }
+#endif
 }
 
 /**
@@ -175,9 +289,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd)
  */
 void HAL_SD_MspDeInit(SD_HandleTypeDef *hsd)
 {
-
-    if (hsd->Instance == SDMMC1)
-    {
+    if (hsd->Instance == SDMMC1) {
         /* Peripheral clock disable */
         __HAL_RCC_SDMMC1_CLK_DISABLE();
 
@@ -190,13 +302,31 @@ void HAL_SD_MspDeInit(SD_HandleTypeDef *hsd)
          PC8     ------> SDIO_D0
          */
         HAL_GPIO_DeInit(GPIOC, GPIO_PIN_12 | GPIO_PIN_11 | GPIO_PIN_10 | GPIO_PIN_9 | GPIO_PIN_8);
-
         HAL_GPIO_DeInit(GPIOD, GPIO_PIN_2);
-
-        /* SDMMC1 DMA DeInit */
-        HAL_DMA_DeInit(hsd->hdmarx);
-        HAL_DMA_DeInit(hsd->hdmatx);
     }
+
+#ifdef SDMMC2
+    if (hsd->Instance == SDMMC2) {
+        /* Peripheral clock disable */
+        __HAL_RCC_SDMMC2_CLK_DISABLE();
+
+        /**SDMMC2 GPIO Configuration
+        PB4     ------> SDMMC2_D3
+        PB3     ------> SDMMC2_D2
+        PD7     ------> SDMMC2_CMD
+        PD6     ------> SDMMC2_CK
+        PG10     ------> SDMMC2_D1
+        PG9     ------> SDMMC2_D0
+        */
+        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_4|GPIO_PIN_3);
+        HAL_GPIO_DeInit(GPIOD, GPIO_PIN_7|GPIO_PIN_6);
+        HAL_GPIO_DeInit(GPIOG, GPIO_PIN_9|GPIO_PIN_10);
+    }
+#endif
+
+    /* SDMMC DMA DeInit */
+    HAL_DMA_DeInit(hsd->hdmarx);
+    HAL_DMA_DeInit(hsd->hdmatx);
 }
 
 /**
@@ -209,24 +339,49 @@ __weak void SD_MspDeInit(SD_HandleTypeDef *hsd, void *Params)
     static DMA_HandleTypeDef dma_rx_handle;
     static DMA_HandleTypeDef dma_tx_handle;
 
-    /* Disable NVIC for DMA transfer complete interrupts */
-    HAL_NVIC_DisableIRQ(DMA2_Stream3_IRQn);
-    HAL_NVIC_DisableIRQ(DMA2_Stream6_IRQn);
 
-    /* Deinitialize the stream for new transfer */
-    dma_rx_handle.Instance = DMA2_Stream3;
-    HAL_DMA_DeInit(&dma_rx_handle);
+    if (hsd->Instance == SDMMC1) {
+        /* Disable NVIC for DMA transfer complete interrupts */
+        HAL_NVIC_DisableIRQ(DMA2_Stream3_IRQn);
+        HAL_NVIC_DisableIRQ(DMA2_Stream6_IRQn);
 
-    /* Deinitialize the stream for new transfer */
-    dma_tx_handle.Instance = DMA2_Stream6;
-    HAL_DMA_DeInit(&dma_tx_handle);
+        /* Deinitialize the stream for new transfer */
+        dma_rx_handle.Instance = DMA2_Stream3;
+        HAL_DMA_DeInit(&dma_rx_handle);
 
-    /* Disable NVIC for SDMMC interrupts */
-    HAL_NVIC_DisableIRQ(SDMMC1_IRQn);
+        /* Deinitialize the stream for new transfer */
+        dma_tx_handle.Instance = DMA2_Stream6;
+        HAL_DMA_DeInit(&dma_tx_handle);
 
-    /* Disable SDMMC clock */
-    __HAL_RCC_SDMMC1_CLK_DISABLE();
+        /* Disable NVIC for SDMMC interrupts */
+        HAL_NVIC_DisableIRQ(SDMMC1_IRQn);
+
+        /* Disable SDMMC clock */
+        __HAL_RCC_SDMMC1_CLK_DISABLE();
+    }
+
+#ifdef SDMMC2
+    if (hsd->Instance == SDMMC2) {
+        /* Disable NVIC for DMA transfer complete interrupts */
+        HAL_NVIC_DisableIRQ(DMA2_Stream0_IRQn);
+        HAL_NVIC_DisableIRQ(DMA2_Stream5_IRQn);
+
+        /* Deinitialize the stream for new transfer */
+        dma_rx_handle.Instance = DMA2_Stream0;
+        HAL_DMA_DeInit(&dma_rx_handle);
+
+        /* Deinitialize the stream for new transfer */
+        dma_tx_handle.Instance = DMA2_Stream5;
+        HAL_DMA_DeInit(&dma_tx_handle);
+        /* Disable NVIC for SDMMC interrupts */
+        HAL_NVIC_DisableIRQ(SDMMC2_IRQn);
+
+        /* Disable SDMMC clock */
+        __HAL_RCC_SDMMC2_CLK_DISABLE();
+    }
+#endif
 }
+
 
 /**
   * @brief  Enables the SD wide bus mode.
@@ -270,7 +425,11 @@ uint8_t SD_Init(void)
 {
     uint8_t sd_state = MSD_OK;
 
+#ifdef TARGET_DISCO_F769NI
+    hsd.Instance = SDMMC2;
+#else
     hsd.Instance = SDMMC1;
+#endif
     hsd.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
     hsd.Init.ClockBypass = SDMMC_CLOCK_BYPASS_DISABLE;
     hsd.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
@@ -301,8 +460,6 @@ uint8_t SD_DeInit(void)
 {
     uint8_t sd_state = MSD_OK;
 
-    hsd.Instance = SDMMC1;
-
     /* HAL SD deinitialization */
     if (HAL_SD_DeInit(&hsd) != HAL_OK)
     {
@@ -310,7 +467,6 @@ uint8_t SD_DeInit(void)
     }
 
     /* Msp SD deinitialization */
-    hsd.Instance = SDMMC1;
     SD_MspDeInit(&hsd, NULL);
 
     return sd_state;
