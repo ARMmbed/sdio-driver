@@ -20,6 +20,13 @@ if("STM32F7" IN_LIST MBED_TARGET_LABELS)
     )
 endif()
 
+if("STM32H7" IN_LIST MBED_TARGET_LABELS)
+    target_include_directories(component_sdio INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/TARGET_STM/TARGET_STM32H7)
+    list(APPEND SOURCEFILES
+        TARGET_STM/TARGET_STM32H7/sdio_device.c
+    )
+endif()
+
 
 target_sources(component_sdio
     INTERFACE
